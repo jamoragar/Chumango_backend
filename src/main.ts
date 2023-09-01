@@ -8,10 +8,11 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: true
-    })
-  )
+      forbidNonWhitelisted: true,
+    }),
+  );
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT, '0.0.0.0');
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
