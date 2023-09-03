@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ClientDataDto } from './dto/client-data.dto';
 import { CreateResourceDto } from './dto/create-resource.dto';
-import { v2 } from 'cloudinary/';
+import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
+import * as streamifier from 'streamifier';
 
 v2.config({
   cloud_name: 'dgsix0s9f',
@@ -32,9 +33,9 @@ export class ResourcesService {
           `Client with name ${client} already exist.`,
         );
       else
-        return v2.api
-          .create_folder(`clients/${client}`)
-          .then((response) => response);
+        return v2.api.create_folder(`clients/${client}`).then((response) => {
+          return response;
+        });
     });
   }
 
@@ -60,5 +61,22 @@ export class ResourcesService {
     return await v2.api
       .delete_resources(cloudinaryPath)
       .then((response) => response);
+  }
+
+  async uploadImage(
+    file: Express.Multer.File,
+    folder: string,
+  ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+    return await new Promise((resolve, reject) => {
+      const uploadStream = v2.uploader.upload_stream(
+        { folder: `clients/${folder}` },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        },
+      );
+
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
   }
 }
