@@ -39,6 +39,12 @@ export class ResourcesService {
     });
   }
 
+  async getAllClients() {
+    return await v2.api.sub_folders('clients/').then((response) => {
+      console.log(response);
+      return response;
+    });
+  }
   async getAllClientResources(client: string) {
     return await v2.api
       .resources({

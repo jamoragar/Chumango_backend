@@ -21,6 +21,11 @@ export class ResourcesController {
   createClient(@Body() createResourceDto: CreateResourceDto) {
     return this.resourcesService.createClient(createResourceDto);
   }
+  @Get('clients')
+  getAllClients() {
+    return this.resourcesService.getAllClients();
+  }
+
   @Post('image')
   @UseInterceptors(FileInterceptor('file'))
   uploadImage(
