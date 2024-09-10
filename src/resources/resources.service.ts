@@ -1,13 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ClientDataDto } from './dto/client-data.dto';
 import { CreateResourceDto } from './dto/create-resource.dto';
-import { UploadApiErrorResponse, UploadApiResponse, v2 } from 'cloudinary';
+import {
+  UploadApiErrorResponse,
+  UploadApiResponse,
+  v2 as cloudinary,
+} from 'cloudinary';
 import * as streamifier from 'streamifier';
 
-v2.config({
-  cloud_name: 'dgsix0s9f',
-  api_key: '363567531263241',
-  api_secret: 'BDhIJ46AE_PuIH_-GI6To_CaRew',
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
   secure: true,
 });
 
@@ -15,7 +19,7 @@ v2.config({
 export class ResourcesService {
   async isClientCreated(CreateResourceDto: CreateResourceDto) {
     const clientName = CreateResourceDto.client_name;
-    return await v2.api.sub_folders(`clients`).then((response) => {
+    return await cloudinary.api.sub_folders(`clients`).then((response) => {
       const folders: Array<object> = response.folders;
       const existFolderClient: boolean = folders.some((folder) =>
         Object.values(folder).some((name) => name.includes(clientName)),
@@ -33,20 +37,22 @@ export class ResourcesService {
           `Client with name ${client} already exist.`,
         );
       else
-        return v2.api.create_folder(`clients/${client}`).then((response) => {
-          return response;
-        });
+        return cloudinary.api
+          .create_folder(`clients/${client}`)
+          .then((response) => {
+            return response;
+          });
     });
   }
 
   async getAllClients() {
-    return await v2.api.sub_folders('clients/').then((response) => {
+    return await cloudinary.api.sub_folders('clients/').then((response) => {
       console.log(response);
       return response;
     });
   }
   async getAllClientResources(client: string) {
-    return await v2.api
+    return await cloudinary.api
       .resources({
         type: 'upload',
         resource_type: 'image',
@@ -64,7 +70,7 @@ export class ResourcesService {
     const path = `clients/${client}`;
     const cloudinaryPath = images.map((image) => `${path}/${image}`);
 
-    return await v2.api
+    return await cloudinary.api
       .delete_resources(cloudinaryPath)
       .then((response) => response);
   }
@@ -74,7 +80,7 @@ export class ResourcesService {
     folder: string,
   ): Promise<UploadApiResponse | UploadApiErrorResponse> {
     return await new Promise((resolve, reject) => {
-      const uploadStream = v2.uploader.upload_stream(
+      const uploadStream = cloudinary.uploader.upload_stream(
         { folder: `clients/${folder}` },
         (error, result) => {
           if (error) return reject(error);
