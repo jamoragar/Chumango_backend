@@ -22,15 +22,20 @@
   "dependencies": {
     "@nestjs/cli": "^9.0.0",
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^9.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/swagger": "^7.4.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cloudinary": "^1.33.0",
+    "dotenv": "^16.4.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
-    "streamifier": "^0.1.1"
+    "streamifier": "^0.1.1",
+    "swagger-ui-express": "^5.0.1",
+    "webpack": "^5.94.0"
   },
   "devDependencies": {
     "@nestjs/schematics": "^9.0.0",

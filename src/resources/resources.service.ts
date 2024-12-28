@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ClientDataDto } from './dto/client-data.dto';
 import { CreateResourceDto } from './dto/create-resource.dto';
+import { ConfigService } from '@nestjs/config';
 import {
   UploadApiErrorResponse,
   UploadApiResponse,
@@ -8,15 +9,17 @@ import {
 } from 'cloudinary';
 import * as streamifier from 'streamifier';
 
-cloudinary.config({
-  cloud_name: process.env.CLOUD_NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET,
-  secure: true,
-});
-
 @Injectable()
 export class ResourcesService {
+  constructor(private configService: ConfigService) {
+    cloudinary.config({
+      cloud_name: this.configService.get<string>('CLOUD_NAME'),
+      api_key: this.configService.get<string>('API_KEY'),
+      api_secret: this.configService.get<string>('API_SECRET'),
+      secure: true,
+    });
+  }
+
   async isClientCreated(CreateResourceDto: CreateResourceDto) {
     const clientName = CreateResourceDto.client_name;
     return await cloudinary.api.sub_folders(`clients`).then((response) => {
@@ -46,7 +49,7 @@ export class ResourcesService {
   }
 
   async getAllClients() {
-    return await cloudinary.api.sub_folders('clients/').then((response) => {
+    return await cloudinary.api.sub_folders('clients').then((response) => {
       console.log(response);
       return response;
     });
@@ -89,6 +92,18 @@ export class ResourcesService {
       );
 
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
+  }
+
+  async deleteImage(client: string, publicId: string): Promise<any> {
+    return await new Promise((resolve, reject) => {
+      cloudinary.uploader.destroy(
+        `clients/${client}/${publicId}`,
+        (err, res) => {
+          if (err) return reject(err);
+          resolve(res);
+        },
+      );
     });
   }
 }
