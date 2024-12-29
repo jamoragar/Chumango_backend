@@ -75,7 +75,12 @@ export class ResourcesService {
 
     return await cloudinary.api
       .delete_resources(cloudinaryPath)
-      .then((response) => response);
+      .then(async (response) => {
+        if (response) {
+          await cloudinary.api.delete_folder(path);
+          return response;
+        }
+      });
   }
 
   async uploadImage(
