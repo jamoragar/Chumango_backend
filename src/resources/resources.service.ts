@@ -75,9 +75,9 @@ export class ResourcesService {
 
     return await cloudinary.api
       .delete_resources(cloudinaryPath)
-      .then(async (response) => {
+      .then((response) => {
         if (response) {
-          await cloudinary.api.delete_folder(path);
+          cloudinary.api.delete_folder(path).then(console.log);
           return response;
         }
       });
