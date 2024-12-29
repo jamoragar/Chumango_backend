@@ -75,11 +75,16 @@ export class ResourcesService {
 
     return await cloudinary.api
       .delete_resources(cloudinaryPath)
-      .then((response) => {
-        if (response) {
-          cloudinary.api.delete_folder(path).then(console.log);
+      .then(async (response) => {
+        if (response.deleted) {
+          await cloudinary.api.delete_folder(path);
           return response;
+        } else {
+          throw new Error('Failed to delete some resources');
         }
+      })
+      .catch((error) => {
+        throw new Error(`Error deleting resources: ${error.message}`);
       });
   }
 
