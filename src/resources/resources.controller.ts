@@ -54,7 +54,8 @@ export class ResourcesController {
 
   @Delete()
   @ApiOperation({
-    summary: 'Elimina todas las imagenes de un cliente en Cloudinary.',
+    summary:
+      'Elimina todas las imagenes de un cliente en Cloudinary y su respectiva carpeta.',
   })
   removeClientImages(@Body() dataClient: ClientDataDto) {
     return this.resourcesService.removeClientImages(dataClient);
