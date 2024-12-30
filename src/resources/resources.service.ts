@@ -8,6 +8,7 @@ import {
   v2 as cloudinary,
 } from 'cloudinary';
 import * as streamifier from 'streamifier';
+import { EditResourceDto } from './dto/edit-resource.dto';
 
 @Injectable()
 export class ResourcesService {
@@ -46,6 +47,35 @@ export class ResourcesService {
             return response;
           });
     });
+  }
+
+  async editClientName(editResourceDto: EditResourceDto) {
+    const clientName = `clients/${editResourceDto.client_name}`;
+    const newClientName = `clients/${editResourceDto.new_client_name}`;
+    try {
+      // Listar todos los recursos en la carpeta antigua
+      const resources = await cloudinary.api.resources({
+        type: 'upload',
+        prefix: clientName,
+        max_results: 500,
+      });
+      console.log(resources);
+
+      // Mover cada recurso a la nueva carpeta
+      for (const resource of resources.resources) {
+        const oldPublicId = resource.public_id;
+        const newPublicId = oldPublicId.replace(clientName, newClientName);
+
+        await cloudinary.uploader.rename(oldPublicId, newPublicId);
+        console.log(`Recurso movido: ${oldPublicId} -> ${newPublicId}`);
+      }
+
+      await cloudinary.api.delete_folder(clientName);
+      console.log(`Carpeta eliminada: ${clientName}`);
+    } catch (error) {
+      console.error('Error renombrando la carpeta:', error);
+      throw error;
+    }
   }
 
   async getAllClients() {

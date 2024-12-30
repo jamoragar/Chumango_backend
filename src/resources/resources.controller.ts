@@ -13,6 +13,7 @@ import { CreateResourceDto } from './dto/create-resource.dto';
 import { ClientDataDto } from './dto/client-data.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { EditResourceDto } from './dto/edit-resource.dto';
 
 @ApiTags('images')
 @Controller('resources')
@@ -39,6 +40,14 @@ export class ResourcesController {
   @ApiOperation({ summary: 'Crea la carpeta clientes en Cloudinary.' })
   createClient(@Body() createResourceDto: CreateResourceDto) {
     return this.resourcesService.createClient(createResourceDto);
+  }
+
+  @Post('renameClient')
+  @ApiOperation({
+    summary: 'Cambia el nombre de la carpeta del cliente por uno nuevo.',
+  })
+  editClientName(@Body() editResourceDto: EditResourceDto) {
+    return this.resourcesService.editClientName(editResourceDto);
   }
 
   @Post('image')
